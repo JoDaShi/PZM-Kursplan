@@ -676,13 +676,9 @@ function formatHinweis(hinweis) {
 
   h = h.replace(/Schwitter\s+Dorfstr\.?\s*1/i, 'Schwitter Dorfstr. 1');
   h = h.replace(/Pfarrheim\s+Lendringsen\s*[·•-]\s*Mitglieder\s+kostenlos\s*[·•-]\s*Extern:\s*Kursgebühr\s*120€\/12x/i,
-    'Pfarrheim Lendringsen
-Mitglieder kostenlos
-Extern: 120€/12x');
+    'Pfarrheim Lendringsen\nMitglieder kostenlos\nExtern: 120€/12x');
   h = h.replace(/Pfarrheim\s+Lendringsen\s+Mitglieder\s+kostenlos\s+Extern:\s*Kursgebühr\s*120€\/12x/i,
-    'Pfarrheim Lendringsen
-Mitglieder kostenlos
-Extern: 120€/12x');
+    'Pfarrheim Lendringsen\nMitglieder kostenlos\nExtern: 120€/12x');
 
   return h;
 }
@@ -690,8 +686,7 @@ Extern: 120€/12x');
 function hinweisKlasse(hinweis) {
   const h = String(hinweis || '').trim();
   if (!h) return '';
-  if (h.includes('
-') || h.length > 42) return ' lang';
+  if (h.includes('\n') || h.length > 42) return ' lang';
   if (h.length <= 24) return ' kurz';
   return '';
 }
@@ -699,8 +694,7 @@ function hinweisKlasse(hinweis) {
 function hinweisHTML(hinweis) {
   const h = formatHinweis(hinweis);
   if (!h) return '';
-  return h.split('
-').map(zeile => esc(zeile)).join('<br>');
+  return h.split('\n').map(zeile => esc(zeile)).join('<br>');
 }
 
 function karteHTML(k) {
