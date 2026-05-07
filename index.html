@@ -197,10 +197,11 @@ body {
   min-height: 84px;
   background: var(--health-soft);
   border-radius: 7px;
-  padding: 10px 31px 10px 12px;
+  padding: 10px 34px 10px 12px;
   box-shadow: 0 1px 0 rgba(0,0,0,0.05);
   overflow: hidden;
   border-top: 4px solid var(--health);
+  min-width: 0;
 }
 
 .kurs-card.kat-mindset { background: var(--mindset-soft); border-top-color: var(--mindset); }
@@ -222,6 +223,9 @@ body {
   letter-spacing: -0.02em;
   color: #3f4042;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
 }
 
 .kurs-trainer {
@@ -233,10 +237,21 @@ body {
 
 .kurs-hinweis {
   margin-top: 3px;
-  font-size: 0.58rem;
-  line-height: 1.2;
+  font-size: 0.52rem;
+  line-height: 1.15;
   color: #535350;
   font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.kurs-hinweis.kurz {
+  white-space: nowrap;
+  font-size: 0.5rem;
+}
+
+.kurs-hinweis.lang {
+  font-size: 0.5rem;
+  line-height: 1.12;
 }
 
 .kurs-zusatz {
@@ -470,12 +485,15 @@ body {
     margin-bottom: 8px;
   }
 
-  .kurs-hinweis {
+  .kurs-hinweis,
+  .kurs-hinweis.kurz,
+  .kurs-hinweis.lang {
     font-size: 0.98rem;
     line-height: 1.35;
     color: #9b813f;
     font-style: italic;
     font-weight: 500;
+    white-space: normal;
   }
 
   .kurs-zusatz {
@@ -652,6 +670,39 @@ function sortierteKurse(kurse) {
   });
 }
 
+function formatHinweis(hinweis) {
+  let h = String(hinweis || '').trim();
+  if (!h) return '';
+
+  h = h.replace(/Schwitter\s+Dorfstr\.?\s*1/i, 'Schwitter Dorfstr. 1');
+  h = h.replace(/Pfarrheim\s+Lendringsen\s*[·•-]\s*Mitglieder\s+kostenlos\s*[·•-]\s*Extern:\s*Kursgebühr\s*120€\/12x/i,
+    'Pfarrheim Lendringsen
+Mitglieder kostenlos
+Extern: 120€/12x');
+  h = h.replace(/Pfarrheim\s+Lendringsen\s+Mitglieder\s+kostenlos\s+Extern:\s*Kursgebühr\s*120€\/12x/i,
+    'Pfarrheim Lendringsen
+Mitglieder kostenlos
+Extern: 120€/12x');
+
+  return h;
+}
+
+function hinweisKlasse(hinweis) {
+  const h = String(hinweis || '').trim();
+  if (!h) return '';
+  if (h.includes('
+') || h.length > 42) return ' lang';
+  if (h.length <= 24) return ' kurz';
+  return '';
+}
+
+function hinweisHTML(hinweis) {
+  const h = formatHinweis(hinweis);
+  if (!h) return '';
+  return h.split('
+').map(zeile => esc(zeile)).join('<br>');
+}
+
 function karteHTML(k) {
   const von = feld(k, ['uhrzeit_von','Uhrzeit_von','Uhrzeit von','von']);
   const bis = feld(k, ['uhrzeit_bis','Uhrzeit_bis','Uhrzeit bis','bis']);
@@ -659,7 +710,7 @@ function karteHTML(k) {
   const trainer = feld(k, ['trainer','Trainer']);
   const kategorie = feld(k, ['kategorie','Kategorie']);
   const raum = formatRaum(feld(k, ['kursraum','Kursraum','Raum','raum']));
-  const hinweis = feld(k, ['hinweis','Hinweis']);
+  const hinweis = formatHinweis(feld(k, ['hinweis','Hinweis']));
   const zusatz = feld(k, ['zusatz','Zusatz']);
   const zeit = [von, bis].filter(Boolean).join(' – ');
 
@@ -667,7 +718,7 @@ function karteHTML(k) {
     '<div class="kurs-zeit">' + esc(zeit) + (zeit ? ' Uhr' : '') + '</div>' +
     '<div class="kurs-name">' + esc(kursname) + '</div>' +
     (trainer ? '<div class="kurs-trainer">' + esc(trainer) + '</div>' : '') +
-    (hinweis ? '<div class="kurs-hinweis">' + esc(hinweis) + '</div>' : '') +
+    (hinweis ? '<div class="kurs-hinweis' + hinweisKlasse(hinweis) + '">' + hinweisHTML(hinweis) + '</div>' : '') +
     (zusatz ? '<div class="kurs-zusatz">' + esc(zusatz) + '</div>' : '') +
     (raum ? '<div class="room-badge' + raumKlasse(raum) + '">' + esc(raum) + '</div>' : '') +
   '</article>';
