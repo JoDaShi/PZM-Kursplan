@@ -181,15 +181,31 @@ body {
 }
 
 .tag-spalte {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-content: stretch;
+  min-height: 760px;
+}
+
+.tag-zone {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px 12px;
   align-content: start;
-  min-height: 560px;
 }
 
-.tag-spalte.mehrspaltig {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.tag-zone.zone-mid {
+  margin-top: 4px;
+}
+
+.tag-zone.zone-late {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.tag-zone:empty {
+  display: none;
 }
 
 .kurs-card {
@@ -279,14 +295,14 @@ body {
   color: #4f504f;
   border-radius: 0 0 7px 7px;
   padding: 7px 10px;
-  font-size: 0.54rem;
-  line-height: 1.18;
+  font-size: 0.59rem;
+  line-height: 1.24;
   font-weight: 700;
 }
 
 .kurs-info-box strong {
   display: block;
-  font-size: 0.56rem;
+  font-size: 0.6rem;
   margin-bottom: 2px;
 }
 
@@ -374,7 +390,8 @@ body {
   .hero { grid-template-columns: 1fr; }
   .hero-meta { text-align: left; padding-top: 14px; }
   .plan-grid { gap: 12px; }
-  .tag-spalte, .tag-spalte.mehrspaltig { grid-template-columns: 1fr; }
+  .tag-spalte { min-height: 0; }
+  .tag-zone { grid-template-columns: 1fr; }
   .tag-spalte + .tag-spalte { padding-left: 12px; }
 }
 
@@ -827,6 +844,31 @@ function karteHTML(k, kompakt) {
   return card;
 }
 
+
+function zeitGruppe(k) {
+  const start = minuten(feld(k, ['uhrzeit_von','Uhrzeit_von','Uhrzeit von','von']));
+  if (start >= 17 * 60) return 'late';
+  if (start >= 13 * 60) return 'mid';
+  return 'early';
+}
+
+function zonenHTML(kurse) {
+  const early = [];
+  const mid = [];
+  const late = [];
+
+  kurse.forEach(k => {
+    const gruppe = zeitGruppe(k);
+    if (gruppe === 'late') late.push(k);
+    else if (gruppe === 'mid') mid.push(k);
+    else early.push(k);
+  });
+
+  return '<div class="tag-zone zone-early">' + early.map(k => karteHTML(k, true)).join('') + '</div>' +
+         '<div class="tag-zone zone-mid">' + mid.map(k => karteHTML(k, true)).join('') + '</div>' +
+         '<div class="tag-zone zone-late">' + late.map(k => karteHTML(k, true)).join('') + '</div>';
+}
+
 function renderDayNav() {
   const heuteTag = WOCHENTAG_MAP[new Date().getDay()] || '';
   const nav = document.getElementById('dayNav');
@@ -843,9 +885,8 @@ function renderDesktop() {
   }
   grid.innerHTML = TAGE.map(tag => {
     const kurse = sortierteKurse(alleKurse.filter(k => feld(k, ['tag','Tag']) === tag));
-    const cls = 'tag-spalte';
-    return '<section class="' + cls + '">' +
-      (kurse.length ? kurse.map(k => karteHTML(k, true)).join('') : '<div class="leer-tag">Keine Kurse</div>') +
+    return '<section class="tag-spalte">' +
+      (kurse.length ? zonenHTML(kurse) : '<div class="leer-tag">Keine Kurse</div>') +
     '</section>';
   }).join('');
 }
