@@ -366,9 +366,20 @@ body {
 
   .mobile-kurs-anzahl {
     margin-top: 7px;
+    min-height: 1.25em;
     font-size: 0.92rem;
     font-weight: 500;
     opacity: 0.92;
+    white-space: nowrap;
+  }
+
+  .mobile-tag-gross {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .mobile-nav-buttons {
+    flex-shrink: 0;
   }
 
   .mobile-nav-buttons {
@@ -669,7 +680,7 @@ function renderDesktop() {
   }
   grid.innerHTML = TAGE.map(tag => {
     const kurse = sortierteKurse(alleKurse.filter(k => feld(k, ['tag','Tag']) === tag));
-    const cls = kurse.length > 12 ? 'tag-spalte mehrspaltig' : 'tag-spalte';
+    const cls = 'tag-spalte';
     return '<section class="' + cls + '">' +
       (kurse.length ? kurse.map(karteHTML).join('') : '<div class="leer-tag">Keine Kurse</div>') +
     '</section>';
@@ -691,7 +702,7 @@ function updateMobileHeader() {
   const anzahl = alleKurse.filter(k => feld(k, ['tag','Tag']) === TAGE[aktiverIndex]).length;
   const istHeute = aktiverIndex === heuteIndex() && tagNr >= 1 && tagNr <= 5;
   document.getElementById('mobileAnzahl').textContent = anzahl > 0
-    ? anzahl + ' Kurs' + (anzahl !== 1 ? 'e' : '') + (istHeute ? ' heute' : ' an diesem Tag')
+    ? anzahl + ' Kurs' + (anzahl !== 1 ? 'e' : '')
     : 'Keine Kurse';
 
   document.getElementById('btnHeute').className = 'nav-heute' + (istHeute ? ' aktiv-heute' : '');
