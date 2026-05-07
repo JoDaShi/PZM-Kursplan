@@ -31,6 +31,7 @@
   --beige: var(--mindset-soft);
   --green: var(--fitness-soft);
   --line: #c9c6c0;
+  --day-separator: rgba(55,55,56,0.20);
   --shadow: 0 12px 28px rgba(30,30,30,0.08);
 }
 
@@ -144,12 +145,12 @@ body {
 }
 
 .day-btn {
-  padding: 12px 6px;
+  padding: 14px 6px;
   border: 0;
   background: transparent;
   font-family: var(--font);
   color: #4d4d4d;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -165,19 +166,24 @@ body {
 .plan-wrapper {
   max-width: 1480px;
   margin: 0 auto;
-  padding: 14px 30px 18px;
+  padding: 18px 30px 22px;
 }
 
 .plan-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
+}
+
+.tag-spalte + .tag-spalte {
+  border-left: 1px solid var(--day-separator);
+  padding-left: 18px;
 }
 
 .tag-spalte {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 10px;
+  gap: 10px 12px;
   align-content: start;
   min-height: 560px;
 }
@@ -188,10 +194,10 @@ body {
 
 .kurs-card {
   position: relative;
-  min-height: 74px;
+  min-height: 84px;
   background: var(--health-soft);
   border-radius: 7px;
-  padding: 8px 28px 8px 10px;
+  padding: 10px 31px 10px 12px;
   box-shadow: 0 1px 0 rgba(0,0,0,0.05);
   overflow: hidden;
   border-top: 4px solid var(--health);
@@ -202,16 +208,16 @@ body {
 .kurs-card.kat-hinweis { background: #c8cbc2; border-top-color: var(--fitness); }
 
 .kurs-zeit {
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   color: #606061;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.15;
 }
 
 .kurs-name {
   margin-top: 2px;
-  font-size: 0.73rem;
-  line-height: 1.04;
+  font-size: 0.82rem;
+  line-height: 1.08;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: #3f4042;
@@ -219,7 +225,7 @@ body {
 }
 
 .kurs-trainer {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   color: #666;
   font-weight: 500;
   line-height: 1.2;
@@ -227,16 +233,16 @@ body {
 
 .kurs-hinweis {
   margin-top: 3px;
-  font-size: 0.52rem;
-  line-height: 1.15;
+  font-size: 0.58rem;
+  line-height: 1.2;
   color: #535350;
   font-weight: 700;
 }
 
 .kurs-zusatz {
   margin-top: 3px;
-  font-size: 0.48rem;
-  line-height: 1.12;
+  font-size: 0.54rem;
+  line-height: 1.18;
   color: #5a5a56;
   font-weight: 600;
 }
@@ -245,13 +251,13 @@ body {
   position: absolute;
   right: 7px;
   bottom: 7px;
-  width: 17px;
-  height: 17px;
+  width: 19px;
+  height: 19px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.56rem;
+  font-size: 0.68rem;
   font-weight: 800;
   background: #565958;
   color: white;
@@ -284,19 +290,19 @@ body {
   flex-wrap: wrap;
   gap: 13px 18px;
   align-items: center;
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .legend-room-dot {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-right: 5px;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   background: #e0dfdc;
   color: #555;
   font-weight: 800;
@@ -324,8 +330,9 @@ body {
   .topbar { grid-template-columns: 1fr; }
   .hero { grid-template-columns: 1fr; }
   .hero-meta { text-align: left; padding-top: 14px; }
-  .plan-grid { gap: 10px; }
+  .plan-grid { gap: 12px; }
   .tag-spalte, .tag-spalte.mehrspaltig { grid-template-columns: 1fr; }
+  .tag-spalte + .tag-spalte { padding-left: 12px; }
 }
 
 @media (max-width: 699px) {
@@ -418,6 +425,8 @@ body {
 
   .plan-single .tag-spalte,
   .plan-single .tag-spalte.mehrspaltig {
+    border-left: 0;
+    padding-left: 0;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -439,8 +448,8 @@ body {
   .kurs-card.kat-gesundheitssport { border-left-color: var(--health); background: white; }
 
   .kurs-zeit {
-    font-size: 1rem;
-    line-height: 1.25;
+    font-size: 1.04rem;
+    line-height: 1.28;
     color: var(--health);
     margin-bottom: 12px;
   }
@@ -449,29 +458,29 @@ body {
   .kurs-card.kat-fitness .kurs-zeit { color: var(--fitness); }
 
   .kurs-name {
-    font-size: 1.18rem;
-    line-height: 1.18;
+    font-size: 1.23rem;
+    line-height: 1.2;
     letter-spacing: 0.02em;
     margin-bottom: 10px;
   }
 
   .kurs-trainer {
-    font-size: 1rem;
+    font-size: 1.04rem;
     color: #777;
     margin-bottom: 8px;
   }
 
   .kurs-hinweis {
-    font-size: 0.95rem;
-    line-height: 1.3;
+    font-size: 0.98rem;
+    line-height: 1.35;
     color: #9b813f;
     font-style: italic;
     font-weight: 500;
   }
 
   .kurs-zusatz {
-    font-size: 0.75rem;
-    line-height: 1.3;
+    font-size: 0.82rem;
+    line-height: 1.35;
     color: #777;
     font-weight: 600;
   }
@@ -496,7 +505,7 @@ body {
 
   .room-legend, .cat-legend {
     gap: 12px 16px;
-    font-size: 0.78rem;
+    font-size: 0.86rem;
   }
 
   .legend-room-dot {
