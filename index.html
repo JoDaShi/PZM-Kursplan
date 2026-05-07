@@ -223,9 +223,9 @@ body {
   letter-spacing: -0.02em;
   color: #3f4042;
   text-transform: uppercase;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   word-break: normal;
-  hyphens: auto;
+  hyphens: none;
 }
 
 .kurs-trainer {
@@ -250,8 +250,8 @@ body {
 }
 
 .kurs-hinweis.lang {
-  font-size: 0.5rem;
-  line-height: 1.12;
+  font-size: 0.48rem;
+  line-height: 1.1;
 }
 
 .kurs-zusatz {
@@ -260,6 +260,34 @@ body {
   line-height: 1.18;
   color: #5a5a56;
   font-weight: 600;
+}
+
+.kurs-stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kurs-stack .kurs-card {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  min-height: 78px;
+}
+
+.kurs-info-box {
+  background: #d4d4cf;
+  color: #4f504f;
+  border-radius: 0 0 7px 7px;
+  padding: 7px 10px;
+  font-size: 0.54rem;
+  line-height: 1.18;
+  font-weight: 700;
+}
+
+.kurs-info-box strong {
+  display: block;
+  font-size: 0.56rem;
+  margin-bottom: 2px;
 }
 
 .room-badge {
@@ -503,6 +531,18 @@ body {
     font-weight: 600;
   }
 
+  .kurs-stack {
+    display: block;
+  }
+
+  .kurs-stack .kurs-card {
+    border-radius: 18px;
+  }
+
+  .kurs-info-box {
+    display: none;
+  }
+
   .room-badge {
     width: 36px;
     height: 36px;
@@ -676,9 +716,9 @@ function formatHinweis(hinweis) {
 
   h = h.replace(/Schwitter\s+Dorfstr\.?\s*1/i, 'Schwitter Dorfstr. 1');
   h = h.replace(/Pfarrheim\s+Lendringsen\s*[·•-]\s*Mitglieder\s+kostenlos\s*[·•-]\s*Extern:\s*Kursgebühr\s*120€\/12x/i,
-    'Pfarrheim Lendringsen\nMitglieder kostenlos\nExtern: 120€/12x');
+    'Pfarrheim Lendringsen\nMitglieder kostenlos · Extern: 120€/12x');
   h = h.replace(/Pfarrheim\s+Lendringsen\s+Mitglieder\s+kostenlos\s+Extern:\s*Kursgebühr\s*120€\/12x/i,
-    'Pfarrheim Lendringsen\nMitglieder kostenlos\nExtern: 120€/12x');
+    'Pfarrheim Lendringsen\nMitglieder kostenlos · Extern: 120€/12x');
 
   return h;
 }
@@ -697,18 +737,79 @@ function hinweisHTML(hinweis) {
   return h.split('\n').map(zeile => esc(zeile)).join('<br>');
 }
 
-function karteHTML(k) {
+function vorbereiteteAnzeige(kursname, hinweis, kompakt) {
+  const originalName = String(kursname || '').trim();
+  let name = originalName;
+  let extraHinweis = '';
+
+  if (kompakt) {
+    const n = originalName.toLowerCase();
+
+    if (n.includes('glückliche auszeit') && n.includes('natur')) {
+      name = 'Glückliche Auszeit';
+      extraHinweis = 'in der Natur';
+    }
+
+    if (n.includes('physio-gym') && n.includes('gelenk')) {
+      name = 'Physio-Gym';
+      extraHinweis = 'gelenkschonend';
+    }
+  }
+
+  const vorhandenerHinweis = String(hinweis || '').trim();
+  const neuerHinweis = [extraHinweis, vorhandenerHinweis].filter(Boolean).join('\n');
+
+  return { name, hinweis: neuerHinweis };
+}
+
+function splitInfoLines(hinweis) {
+  const h = formatHinweis(hinweis);
+  if (!h) return [];
+
+  if (/Pfarrheim\s+Lendringsen/i.test(h)) {
+    return [
+      '<strong>Pfarrheim Lendringsen</strong>',
+      'Mitglieder kostenlos',
+      'Extern: 120€/12x'
+    ];
+  }
+
+  if (/Schwitter\s+Dorfstr/i.test(h)) {
+    return [
+      '<strong>Treffpunkt</strong>',
+      'Schwitter Dorfstr. 1'
+    ];
+  }
+
+  return [];
+}
+
+function mainHintForSplit(kursname, hinweis) {
+  const n = String(kursname || '').toLowerCase();
+  if (n.includes('glückliche auszeit')) return 'in der Natur';
+  return '';
+}
+
+function karteHTML(k, kompakt) {
   const von = feld(k, ['uhrzeit_von','Uhrzeit_von','Uhrzeit von','von']);
   const bis = feld(k, ['uhrzeit_bis','Uhrzeit_bis','Uhrzeit bis','bis']);
-  const kursname = feld(k, ['kursname','Kursname','Kurs']);
+  const kursnameRoh = feld(k, ['kursname','Kursname','Kurs']);
   const trainer = feld(k, ['trainer','Trainer']);
   const kategorie = feld(k, ['kategorie','Kategorie']);
   const raum = formatRaum(feld(k, ['kursraum','Kursraum','Raum','raum']));
-  const hinweis = formatHinweis(feld(k, ['hinweis','Hinweis']));
+  const hinweisRoh = formatHinweis(feld(k, ['hinweis','Hinweis']));
+  const anzeige = vorbereiteteAnzeige(kursnameRoh, hinweisRoh, !!kompakt);
+  const kursname = anzeige.name;
+  let hinweis = formatHinweis(anzeige.hinweis);
   const zusatz = feld(k, ['zusatz','Zusatz']);
   const zeit = [von, bis].filter(Boolean).join(' – ');
+  const splitLines = kompakt ? splitInfoLines(hinweisRoh) : [];
 
-  return '<article class="kurs-card ' + klasseKategorie(kategorie) + '">' +
+  if (splitLines.length) {
+    hinweis = mainHintForSplit(kursnameRoh, hinweisRoh);
+  }
+
+  const card = '<article class="kurs-card ' + klasseKategorie(kategorie) + '">' +
     '<div class="kurs-zeit">' + esc(zeit) + (zeit ? ' Uhr' : '') + '</div>' +
     '<div class="kurs-name">' + esc(kursname) + '</div>' +
     (trainer ? '<div class="kurs-trainer">' + esc(trainer) + '</div>' : '') +
@@ -716,6 +817,14 @@ function karteHTML(k) {
     (zusatz ? '<div class="kurs-zusatz">' + esc(zusatz) + '</div>' : '') +
     (raum ? '<div class="room-badge' + raumKlasse(raum) + '">' + esc(raum) + '</div>' : '') +
   '</article>';
+
+  if (splitLines.length) {
+    return '<div class="kurs-stack">' + card +
+      '<div class="kurs-info-box">' + splitLines.join('<br>') + '</div>' +
+    '</div>';
+  }
+
+  return card;
 }
 
 function renderDayNav() {
@@ -736,7 +845,7 @@ function renderDesktop() {
     const kurse = sortierteKurse(alleKurse.filter(k => feld(k, ['tag','Tag']) === tag));
     const cls = 'tag-spalte';
     return '<section class="' + cls + '">' +
-      (kurse.length ? kurse.map(karteHTML).join('') : '<div class="leer-tag">Keine Kurse</div>') +
+      (kurse.length ? kurse.map(k => karteHTML(k, true)).join('') : '<div class="leer-tag">Keine Kurse</div>') +
     '</section>';
   }).join('');
 }
@@ -769,7 +878,7 @@ function renderMobile() {
   const el = document.getElementById('planSingle');
   const kurse = sortierteKurse(alleKurse.filter(k => feld(k, ['tag','Tag']) === tag));
   el.innerHTML = kurse.length
-    ? '<div class="tag-spalte">' + kurse.map(karteHTML).join('') + '</div>'
+    ? '<div class="tag-spalte">' + kurse.map(k => karteHTML(k, false)).join('') + '</div>'
     : '<div class="leer-tag">Keine Kurse an diesem Tag</div>';
   updateMobileHeader();
 }
