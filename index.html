@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PZM Kursplan</title>
+<style>
+@font-face { font-family: 'Montserrat'; font-weight: 400; font-display: swap; src: url('montserrat-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 500; font-display: swap; src: url('montserrat-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 600; font-display: swap; src: url('montserrat-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 700; font-display: swap; src: url('montserrat-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 800; font-display: swap; src: url('montserrat-latin-800-normal.woff2') format('woff2'); }
+
+:root {
+  --font: 'Montserrat', 'Trebuchet MS', system-ui, sans-serif;
+  --dark: #5d5d5b;
+  --title-bg: #994863;
+  --main: #6f7364;
+  --secondary: #bfbcbc;
+  --bg: #f2f1ed;
+  --text: #373738;
+  --muted: #777775;
+  --gold: #ac936b;
+  --health: #7f4456;
+  --mindset: #ac936b;
+  --fitness: #6f7364;
+  --health-soft: #f0e4e8;
+  --mindset-soft: #eee6d9;
+  --fitness-soft: #e3e6de;
+  --rose: var(--health-soft);
+  --beige: var(--mindset-soft);
+  --green: var(--fitness-soft);
+  --line: #c9c6c0;
+  --shadow: 0 12px 28px rgba(30,30,30,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar {
+  background: white;
+  padding: 28px 34px 18px;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.contact-line {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.contact-line strong {
+  display: block;
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.info-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.info-box {
+  background: #f4f3f0;
+  padding: 16px 18px;
+  min-height: 100px;
+}
+
+.info-box.sauna {
+  background: #d2d0d0;
+}
+
+.info-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4c4c4d;
+  margin-bottom: 8px;
+}
+
+.info-text {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #555;
+  font-weight: 500;
+}
+
+.hero {
+  background: white;
+  display: grid;
+  grid-template-columns: minmax(260px, 430px) 1fr;
+  align-items: end;
+}
+
+.hero-title {
+  background: var(--title-bg);
+  color: white;
+  padding: 28px 34px 24px;
+  border-top-right-radius: 26px;
+}
+
+.hero-title .url {
+  font-size: 0.86rem;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+.hero-title h1 {
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 0.92;
+  font-weight: 400;
+  letter-spacing: -0.06em;
+}
+
+.hero-title .stand {
+  font-size: 0.86rem;
+  margin-top: 6px;
+  opacity: 0.9;
+}
+
+.hero-meta {
+  padding: 0 34px 18px;
+  text-align: right;
+  color: var(--dark);
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+
+.day-nav {
+  background: var(--secondary);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.day-btn {
+  padding: 12px 6px;
+  border: 0;
+  background: transparent;
+  font-family: var(--font);
+  color: #4d4d4d;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.day-btn.aktiv {
+  background: rgba(255,255,255,0.25);
+  color: white;
+}
+
+.mobile-nav { display: none; }
+
+.plan-wrapper {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 14px 30px 18px;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tag-spalte {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  align-content: start;
+  min-height: 560px;
+}
+
+.tag-spalte.mehrspaltig {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.kurs-card {
+  position: relative;
+  min-height: 74px;
+  background: var(--health-soft);
+  border-radius: 7px;
+  padding: 8px 28px 8px 10px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  overflow: hidden;
+  border-top: 4px solid var(--health);
+}
+
+.kurs-card.kat-mindset { background: var(--mindset-soft); border-top-color: var(--mindset); }
+.kurs-card.kat-fitness { background: var(--fitness-soft); border-top-color: var(--fitness); }
+.kurs-card.kat-hinweis { background: #c8cbc2; border-top-color: var(--fitness); }
+
+.kurs-zeit {
+  font-size: 0.68rem;
+  color: #606061;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.kurs-name {
+  margin-top: 2px;
+  font-size: 0.73rem;
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #3f4042;
+  text-transform: uppercase;
+}
+
+.kurs-trainer {
+  font-size: 0.68rem;
+  color: #666;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.kurs-hinweis {
+  margin-top: 3px;
+  font-size: 0.52rem;
+  line-height: 1.15;
+  color: #535350;
+  font-weight: 700;
+}
+
+.kurs-zusatz {
+  margin-top: 3px;
+  font-size: 0.48rem;
+  line-height: 1.12;
+  color: #5a5a56;
+  font-weight: 600;
+}
+
+.room-badge {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.56rem;
+  font-weight: 800;
+  background: #565958;
+  color: white;
+}
+
+.room-badge.room-b { background: #767a77; }
+.room-badge.room-c { background: #bcb9b9; color: #4d4d4d; }
+
+.plan-single { display: none; }
+.laden, .leer-tag {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-weight: 600;
+}
+
+.footer {
+  background: var(--dark);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 38px 16px;
+}
+
+.room-legend, .cat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 13px 18px;
+  align-items: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.legend-room-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 5px;
+  font-size: 0.62rem;
+  background: #e0dfdc;
+  color: #555;
+  font-weight: 800;
+}
+
+.legend-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255,255,255,0.8);
+}
+
+.legend-color {
+  width: 24px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+@media (min-width: 700px) {
+  .day-nav { display: grid; }
+  .mobile-nav { display: none; }
+}
+
+@media (max-width: 1100px) {
+  .topbar { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: 1fr; }
+  .hero-meta { text-align: left; padding-top: 14px; }
+  .plan-grid { gap: 10px; }
+  .tag-spalte, .tag-spalte.mehrspaltig { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 699px) {
+  .topbar { display: none; }
+  .hero { display: none; }
+  .day-nav { display: none; }
+  .plan-grid { display: none; }
+  .plan-single { display: block; }
+
+  body { background: var(--bg); }
+
+  .mobile-nav {
+    display: block;
+    background: #9aa29d;
+    color: white;
+    padding: 24px 18px 24px;
+  }
+
+  .mobile-nav-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .mobile-wochentag {
+    font-size: 1.72rem;
+    line-height: 1.05;
+    font-weight: 500;
+  }
+
+  .mobile-datum {
+    margin-top: 7px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    opacity: 0.95;
+  }
+
+  .mobile-kurs-anzahl {
+    margin-top: 7px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    opacity: 0.92;
+  }
+
+  .mobile-nav-buttons {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .nav-pfeil, .nav-heute {
+    border: 1px solid rgba(255,255,255,0.35);
+    color: white;
+    background: rgba(255,255,255,0.12);
+    height: 54px;
+    min-width: 54px;
+    border-radius: 999px;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .nav-heute {
+    min-width: 96px;
+    background: var(--gold);
+    border-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-pfeil:disabled {
+    opacity: 0.38;
+  }
+
+  .plan-wrapper {
+    padding: 26px 18px 34px;
+  }
+
+  .plan-single .tag-spalte,
+  .plan-single .tag-spalte.mehrspaltig {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 0;
+  }
+
+  .kurs-card {
+    min-height: auto;
+    border-radius: 18px;
+    padding: 20px 54px 20px 22px;
+    box-shadow: var(--shadow);
+    border-left: 8px solid var(--health);
+    border-top: 0;
+    background: white;
+  }
+
+  .kurs-card.kat-mindset { border-left-color: var(--mindset); background: white; }
+  .kurs-card.kat-fitness { border-left-color: var(--fitness); background: white; }
+  .kurs-card.kat-gesundheitssport { border-left-color: var(--health); background: white; }
+
+  .kurs-zeit {
+    font-size: 1rem;
+    line-height: 1.25;
+    color: var(--health);
+    margin-bottom: 12px;
+  }
+
+  .kurs-card.kat-mindset .kurs-zeit { color: var(--mindset); }
+  .kurs-card.kat-fitness .kurs-zeit { color: var(--fitness); }
+
+  .kurs-name {
+    font-size: 1.18rem;
+    line-height: 1.18;
+    letter-spacing: 0.02em;
+    margin-bottom: 10px;
+  }
+
+  .kurs-trainer {
+    font-size: 1rem;
+    color: #777;
+    margin-bottom: 8px;
+  }
+
+  .kurs-hinweis {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    color: #9b813f;
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .kurs-zusatz {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    color: #777;
+    font-weight: 600;
+  }
+
+  .room-badge {
+    width: 36px;
+    height: 36px;
+    right: 20px;
+    bottom: 20px;
+    font-size: 0.86rem;
+    background: var(--gold);
+    color: white;
+  }
+
+  .footer {
+    background: transparent;
+    color: var(--muted);
+    padding: 0 18px 34px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .room-legend, .cat-legend {
+    gap: 12px 16px;
+    font-size: 0.78rem;
+  }
+
+  .legend-room-dot {
+    background: #dedbd5;
+  }
+
+  .legend-cat {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+}
+</style>
+</head>
+<body>
+
+<section class="topbar">
+  <div class="contact-line">
+    <strong>PZM SPORT DIREKT 0177 7115081</strong>
+    Bei Anliegen schick uns eine Nachricht
+  </div>
+  <div class="info-boxes">
+    <div class="info-box">
+      <div class="info-title">Betreutes Gerätetraining</div>
+      <div class="info-text"><strong>24H betreut</strong><br>Training rund um die Uhr mit Betreuung im Gerätebereich.</div>
+    </div>
+    <div class="info-box sauna">
+      <div class="info-title">Öffnungszeiten Sauna</div>
+      <div class="info-text">Mo, Di: 16:30 bis 21:45<br>Mi, Do: 16:30 bis 21:45<br>Fr: 16:30 bis 20:30<br>Sa: 09:00 bis 14:30<br>So: 09:00 bis 18:30</div>
+    </div>
+  </div>
+</section>
+
+<section class="hero">
+  <div class="hero-title">
+    <div class="url">www.physiozentrum-menden.de</div>
+    <h1>Kursplan</h1>
+    <div class="stand">Stand Mai 2026</div>
+  </div>
+  <div class="hero-meta">PZM · Tower am Vincenz | Am Stein 24a | 56706 Menden<br>E-Mail: sport-menden@pz-sauerland.de | Tel.: 02373/9197869</div>
+</section>
+
+<div class="day-nav" id="dayNav"></div>
+
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-top">
+    <div class="mobile-tag-gross">
+      <div class="mobile-wochentag" id="mobileWochentag">Montag</div>
+      <div class="mobile-datum" id="mobileDatum">–</div>
+      <div class="mobile-kurs-anzahl" id="mobileAnzahl"></div>
+    </div>
+    <div class="mobile-nav-buttons">
+      <button class="nav-pfeil" id="btnVor" onclick="navigiere(-1)">←</button>
+      <button class="nav-heute" id="btnHeute" onclick="zuHeute()">Heute</button>
+      <button class="nav-pfeil" id="btnNach" onclick="navigiere(1)">→</button>
+    </div>
+  </div>
+</div>
+
+<main class="plan-wrapper">
+  <div class="plan-grid" id="planGrid"><div class="laden">Kurse werden geladen...</div></div>
+  <div class="plan-single" id="planSingle"></div>
+</main>
+
+<footer class="footer">
+  <div class="room-legend">
+    <span><span class="legend-room-dot">A</span>Kursraum A · Etage 1</span>
+    <span><span class="legend-room-dot">B</span>Kursraum B · Etage -1 · Indoor Cycling</span>
+    <span><span class="legend-room-dot">C</span>Kursraum C · Etage 5</span>
+  </div>
+  <div class="cat-legend">
+    <span class="legend-cat"><span class="legend-color" style="background:var(--health)"></span>Gesundheitssport</span>
+    <span class="legend-cat"><span class="legend-color" style="background:var(--mindset)"></span>Mindset</span>
+    <span class="legend-cat"><span class="legend-color" style="background:var(--fitness)"></span>Fitness</span>
+  </div>
+</footer>
+
+<script>
+const TAGE = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+const WOCHENTAG_MAP = {1:'Montag',2:'Dienstag',3:'Mittwoch',4:'Donnerstag',5:'Freitag'};
+let alleKurse = [];
+let aktiverIndex = 0;
+
+function feld(k, namen) {
+  for (const n of namen) {
+    if (k[n] !== undefined && k[n] !== null && k[n] !== '') return k[n];
+  }
+  return '';
+}
+
+function esc(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, function(c) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c];
+  });
+}
+
+function minuten(zeit) {
+  if (!zeit) return 0;
+  const teile = String(zeit).split(':');
+  return (parseInt(teile[0],10) || 0) * 60 + (parseInt(teile[1],10) || 0);
+}
+
+function heuteIndex() {
+  const tag = new Date().getDay();
+  if (tag >= 1 && tag <= 5) return tag - 1;
+  return 0;
+}
+
+function aktiverTag() { return TAGE[aktiverIndex]; }
+
+function istVormittag(zeit) { return minuten(zeit) < 13 * 60; }
+
+function klasseKategorie(kategorie) {
+  const k = String(kategorie || '').toLowerCase();
+  if (k.includes('mind')) return 'kat-mindset';
+  if (k.includes('fit')) return 'kat-fitness';
+  if (k.includes('hinweis')) return 'kat-hinweis';
+  return 'kat-gesundheitssport';
+}
+
+function formatRaum(raum) {
+  const r = String(raum || '').trim();
+  if (!r) return '';
+  const niedrig = r.toLowerCase();
+  if (niedrig.includes('kursraum a') || niedrig === 'a') return 'A';
+  if (niedrig.includes('kursraum b') || niedrig === 'b') return 'B';
+  if (niedrig.includes('kursraum c') || niedrig === 'c') return 'C';
+  return r;
+}
+
+function raumKlasse(raum) {
+  const r = formatRaum(raum).toLowerCase();
+  if (r === 'b') return ' room-b';
+  if (r === 'c') return ' room-c';
+  return '';
+}
+
+function sortierteKurse(kurse) {
+  return [...kurse].sort((a,b) => {
+    const av = minuten(feld(a, ['uhrzeit_von','Uhrzeit_von','Uhrzeit von','von']));
+    const bv = minuten(feld(b, ['uhrzeit_von','Uhrzeit_von','Uhrzeit von','von']));
+    return av - bv;
+  });
+}
+
+function karteHTML(k) {
+  const von = feld(k, ['uhrzeit_von','Uhrzeit_von','Uhrzeit von','von']);
+  const bis = feld(k, ['uhrzeit_bis','Uhrzeit_bis','Uhrzeit bis','bis']);
+  const kursname = feld(k, ['kursname','Kursname','Kurs']);
+  const trainer = feld(k, ['trainer','Trainer']);
+  const kategorie = feld(k, ['kategorie','Kategorie']);
+  const raum = formatRaum(feld(k, ['kursraum','Kursraum','Raum','raum']));
+  const hinweis = feld(k, ['hinweis','Hinweis']);
+  const zusatz = feld(k, ['zusatz','Zusatz']);
+  const zeit = [von, bis].filter(Boolean).join(' – ');
+
+  return '<article class="kurs-card ' + klasseKategorie(kategorie) + '">' +
+    '<div class="kurs-zeit">' + esc(zeit) + (zeit ? ' Uhr' : '') + '</div>' +
+    '<div class="kurs-name">' + esc(kursname) + '</div>' +
+    (trainer ? '<div class="kurs-trainer">' + esc(trainer) + '</div>' : '') +
+    (hinweis ? '<div class="kurs-hinweis">' + esc(hinweis) + '</div>' : '') +
+    (zusatz ? '<div class="kurs-zusatz">' + esc(zusatz) + '</div>' : '') +
+    (raum ? '<div class="room-badge' + raumKlasse(raum) + '">' + esc(raum) + '</div>' : '') +
+  '</article>';
+}
+
+function renderDayNav() {
+  const heuteTag = WOCHENTAG_MAP[new Date().getDay()] || '';
+  const nav = document.getElementById('dayNav');
+  nav.innerHTML = TAGE.map((tag, index) =>
+    '<button class="day-btn ' + (tag === heuteTag ? 'aktiv' : '') + '" onclick="aktiverIndex=' + index + '; renderMobile();">' + tag + '</button>'
+  ).join('');
+}
+
+function renderDesktop() {
+  const grid = document.getElementById('planGrid');
+  if (!alleKurse.length) {
+    grid.innerHTML = '<div class="laden">Kurse werden geladen...</div>';
+    return;
+  }
+  grid.innerHTML = TAGE.map(tag => {
+    const kurse = sortierteKurse(alleKurse.filter(k => feld(k, ['tag','Tag']) === tag));
+    const cls = kurse.length > 12 ? 'tag-spalte mehrspaltig' : 'tag-spalte';
+    return '<section class="' + cls + '">' +
+      (kurse.length ? kurse.map(karteHTML).join('') : '<div class="leer-tag">Keine Kurse</div>') +
+    '</section>';
+  }).join('');
+}
+
+function updateMobileHeader() {
+  const heute = new Date();
+  const tagNr = heute.getDay();
+  const diff = aktiverIndex - (tagNr === 0 ? 6 : tagNr - 1);
+  const datum = new Date(heute);
+  datum.setDate(heute.getDate() + diff);
+
+  document.getElementById('mobileWochentag').textContent = TAGE[aktiverIndex];
+  document.getElementById('mobileDatum').textContent =
+    datum.getDate().toString().padStart(2,'0') + '.' +
+    (datum.getMonth()+1).toString().padStart(2,'0');
+
+  const anzahl = alleKurse.filter(k => feld(k, ['tag','Tag']) === TAGE[aktiverIndex]).length;
+  const istHeute = aktiverIndex === heuteIndex() && tagNr >= 1 && tagNr <= 5;
+  document.getElementById('mobileAnzahl').textContent = anzahl > 0
+    ? anzahl + ' Kurs' + (anzahl !== 1 ? 'e' : '') + (istHeute ? ' heute' : ' an diesem Tag')
+    : 'Keine Kurse';
+
+  document.getElementById('btnHeute').className = 'nav-heute' + (istHeute ? ' aktiv-heute' : '');
+  document.getElementById('btnVor').disabled = aktiverIndex === 0;
+  document.getElementById('btnNach').disabled = aktiverIndex === 4;
+}
+
+function renderMobile() {
+  const tag = aktiverTag();
+  const el = document.getElementById('planSingle');
+  const kurse = sortierteKurse(alleKurse.filter(k => feld(k, ['tag','Tag']) === tag));
+  el.innerHTML = kurse.length
+    ? '<div class="tag-spalte">' + kurse.map(karteHTML).join('') + '</div>'
+    : '<div class="leer-tag">Keine Kurse an diesem Tag</div>';
+  updateMobileHeader();
+}
+
+function navigiere(richtung) {
+  const neu = aktiverIndex + richtung;
+  if (neu >= 0 && neu <= 4) {
+    aktiverIndex = neu;
+    renderMobile();
+  }
+}
+
+function zuHeute() {
+  aktiverIndex = heuteIndex();
+  renderMobile();
+}
+
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'kurse') {
+    alleKurse = Array.isArray(event.data.daten) ? event.data.daten : [];
+    aktiverIndex = heuteIndex();
+    renderDesktop();
+    renderMobile();
+  }
+});
+
+window.addEventListener('load', function() {
+  aktiverIndex = heuteIndex();
+  renderDayNav();
+  updateMobileHeader();
+  window.parent.postMessage({ type: 'bereit' }, '*');
+});
+</script>
+</body>
+</html>
